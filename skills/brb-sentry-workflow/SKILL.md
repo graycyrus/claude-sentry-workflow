@@ -1,7 +1,7 @@
 ---
 name: brb-sentry-workflow
 description: Full Sentry bug triage workflow — fetch errors, classify signal vs noise, analyze root causes, deduplicate against GitHub, and raise well-structured issues. Orchestrates triage, analysis, and issue creation.
-allowed-tools: Bash(git *) Bash(gh *) Read Grep Glob Agent(*)
+allowed-tools: Bash(git *) Bash(gh *) Read Grep Glob Agent(*) mcp__claude_ai_Sentry__*
 argument-hint: "[sentry-project-slug]"
 ---
 
@@ -67,7 +67,7 @@ Use Sentry MCP: search_issues
   projectSlug: <user-selected project>
   query: "is:unresolved"  (add "assigned:me" if user requested)
   sortBy: "freq"
-  regionUrl: "https://us.sentry.io"
+  regionUrl: <from find_organizations result>
 ```
 
 If the user selected multiple projects, run `search_issues` for each in parallel and combine results.

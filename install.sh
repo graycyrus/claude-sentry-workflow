@@ -100,7 +100,11 @@ else
   fi
 
   mkdir -p "$TARGET"
-  cp -r "$TMP_DIR/skills/"* "$TARGET/"
+  for skill in $SKILLS_LIST; do
+    if [ -d "$TMP_DIR/skills/$skill" ]; then
+      cp -r "$TMP_DIR/skills/$skill" "$TARGET/$skill"
+    fi
+  done
 
   echo ""
   echo "Installed skills:"
@@ -113,5 +117,6 @@ else
   echo "Done! Open Claude Code and try: /brb-sentry-workflow"
   echo ""
   echo "To update:  run /brb-sentry-update in Claude Code"
-  echo "To uninstall: rm -rf $TARGET/{$(echo "$SKILLS_LIST" | tr ' ' ',')}"
+  echo "To uninstall:"
+  for skill in $SKILLS_LIST; do echo "  rm -rf \"${TARGET}/$skill\""; done
 fi

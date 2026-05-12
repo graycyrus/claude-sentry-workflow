@@ -1,7 +1,7 @@
 ---
 name: brb-sentry-analyze
 description: Deep-dive into a Sentry bug — read the event, map to source code, identify root cause, assess fix complexity, and document cascade impact.
-allowed-tools: Read Grep Glob Agent(*)
+allowed-tools: Read Grep Glob Agent(*) mcp__claude_ai_Sentry__*
 argument-hint: "<sentry-issue-id>"
 ---
 
@@ -15,7 +15,7 @@ For each real code bug identified in triage, perform a deep analysis before rais
 Use Sentry MCP: search_issue_events
   organizationSlug: $SENTRY_ORG
   issueId: "<issue-id>"
-  regionUrl: "https://us.sentry.io"
+  regionUrl: <from find_organizations result>
 ```
 
 Capture from the event:
