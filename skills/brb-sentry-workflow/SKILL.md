@@ -1,6 +1,6 @@
 ---
 name: brb-sentry-workflow
-description: Full Sentry bug triage workflow — fetch errors, classify signal vs noise, analyze root causes, deduplicate against GitHub, and raise well-structured issues. Orchestrates triage, analysis, and issue creation.
+description: Full Sentry bug triage workflow — fetch errors, categorize by type (including infra/network), analyze root causes, deduplicate against GitHub, and raise well-structured issues for every issue. Orchestrates triage, analysis, and issue creation.
 allowed-tools: Bash(git *) Bash(gh *) Read Grep Glob Agent(*) mcp__claude_ai_Sentry__*
 argument-hint: "[sentry-project-slug]"
 ---
@@ -83,9 +83,9 @@ For each issue, capture:
 
 ---
 
-## Step 3: Triage — separate signal from noise
+## Step 3: Triage — categorize and rank
 
-Run `/brb-sentry-triage` to classify each issue as noise or real bug, group related issues, filter out existing GitHub issues, and score priority.
+Run `/brb-sentry-triage` to categorize each issue (code-bug vs infra/network), group related issues, filter out existing GitHub issues, and score priority. **No issue is dropped** — infra/network issues are categorized and carried forward like any other bug.
 
 Present the ranked list to the user. **Wait for confirmation before proceeding to analysis.**
 
@@ -93,7 +93,7 @@ Present the ranked list to the user. **Wait for confirmation before proceeding t
 
 ## Step 4: Analyze each bug
 
-For each confirmed bug (starting from highest priority), run `/brb-sentry-analyze`.
+For each issue (starting from highest priority), run `/brb-sentry-analyze`.
 
 This deep-dives into the Sentry event, maps it to source code, identifies root cause, and prepares the issue body.
 
@@ -119,7 +119,7 @@ Move down the priority list. Process each bug through Steps 4-5 until:
 |------|--------|------|
 | 1 | Connect to Sentry, ask project + assignee filter | `find_organizations`, `find_projects` (Sentry MCP) |
 | 2 | Fetch unresolved issues | `search_issues` (Sentry MCP) |
-| 3 | Triage: noise vs real, dedup, score | `/brb-sentry-triage` |
+| 3 | Triage: categorize, dedup, score (nothing dropped) | `/brb-sentry-triage` |
 | 4 | Analyze event + source code | `/brb-sentry-analyze` |
 | 5 | Raise GitHub issue | `/brb-sentry-raise-issue` |
 | 6 | Repeat | Next bug in priority order |
@@ -134,3 +134,5 @@ Move down the priority list. Process each bug through Steps 4-5 until:
 - **Scrub sensitive data** — no API keys, tokens, PII, real emails, internal URLs in issue bodies
 - **Always add `sentry-traced-bug` label** — marks Sentry-sourced issues
 - **Always add `os:<platform>` label** — from event tags
+- **Always add `category:<code-bug|infra>` label** — from triage, so infra/network issues stay distinguishable
+- **Never drop issues as noise** — infra/network issues are categorized and raised like any other bug

@@ -39,9 +39,9 @@ Capture: issue ID, title, event count, assignee, first/last seen, URL, OS/platfo
 
 ## Step 3: Triage
 
-### 3a. Classify noise vs signal
+### 3a. Categorize each issue
 
-Filter out infrastructure noise (5xx, rate limits, network errors, user env issues). Keep real code bugs (unknown methods, parse failures, race conditions, etc.).
+Tag each issue by category — `infra` (5xx, rate limits, network errors, user env issues) or `code-bug` (unknown methods, parse failures, race conditions, etc.). **Nothing is dropped**: infra/network issues are categorized and carried forward, then raised as issues like any other bug. Category is metadata, not a filter.
 
 ### 3b. Group by root cause
 
@@ -82,7 +82,7 @@ Show a table per priority level. Wait for user confirmation before analysis.
 
 ## Step 4: Analyze each bug
 
-For each confirmed bug (highest priority first):
+For each issue (highest priority first):
 
 1. **Read the Sentry event** — full stacktrace, tags, platform, version
 2. **Map to source code** — find the file/function that produced the error
@@ -103,7 +103,7 @@ Create a well-structured issue with:
 - Cascade impact
 - Proposed fix approach
 
-Labels: `sentry-traced-bug`, `os:<platform>`, `priority: <level>`, `bug`
+Labels: `sentry-traced-bug`, `os:<platform>`, `category:<code-bug|infra>`, `priority: <level>`, `bug`
 
 ---
 
@@ -119,7 +119,7 @@ Process each bug through Steps 4-5 until all CRITICAL and HIGH bugs have issues,
 |------|--------|------|
 | 1 | Connect to Sentry, ask preferences | `find_organizations`, `find_projects` |
 | 2 | Fetch unresolved issues | `search_issues` |
-| 3a | Classify noise vs real | Manual |
+| 3a | Categorize (code-bug vs infra), nothing dropped | Manual |
 | 3b | Group by root cause | Manual |
 | 3c | Dedup against GitHub | `gh issue list --search` |
 | 3d | Score priority | Events x Blast Radius |
@@ -135,3 +135,5 @@ Process each bug through Steps 4-5 until all CRITICAL and HIGH bugs have issues,
 - **Scrub sensitive data** — no tokens, PII, internal URLs in issue bodies
 - **Always add `sentry-traced-bug` label** — marks Sentry-sourced issues
 - **Always add `os:<platform>` label** — from event tags
+- **Always add `category:<code-bug|infra>` label** — so infra/network issues stay distinguishable
+- **Never drop issues as noise** — categorize infra/network and raise them like any other bug

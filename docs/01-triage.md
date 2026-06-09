@@ -1,10 +1,10 @@
-# Triage: Signal vs Noise
+# Triage: Categorize Every Issue
 
-Detailed reference for classifying Sentry issues.
+Detailed reference for categorizing Sentry issues. **Nothing is skipped** — every issue is categorized and carried forward to analysis and issue creation. Category is metadata that informs analysis and priority, not a filter.
 
-## Noise patterns
+## Infra / network / environment patterns
 
-These are NOT code bugs. Skip them.
+These often originate outside the code. Tag them `category: infra` and carry them forward — they can still hide missing retries, weak error handling, or a real upstream regression worth tracking.
 
 | Pattern | Category | Why |
 |---------|----------|-----|
@@ -19,9 +19,9 @@ These are NOT code bugs. Skip them.
 | `tls handshake eof` | Network | TLS issue |
 | `error sending request for url` | Network | External API down |
 
-## Real bug patterns
+## Code-bug patterns
 
-These ARE code bugs. Keep them.
+Clear code bugs. Tag them `category: code-bug`.
 
 | Pattern | What it means |
 |---------|---------------|
@@ -34,9 +34,9 @@ These ARE code bugs. Keep them.
 | `already active` | Missing idempotency guard |
 | `not initialized` | Race condition at startup |
 
-## Customizing noise patterns
+## Customizing category patterns
 
-Every project has its own noise. If you see patterns that are consistently noise for your project, add them to the noise list. The skill will respect project-specific patterns if documented in the project's CLAUDE.md or similar.
+Every project has its own patterns. If you see errors that are consistently a given category for your project, add them to the tables above. The skill will respect project-specific patterns if documented in the project's CLAUDE.md or similar. Use them to tag the category — never to drop an issue.
 
 ## Grouping
 
@@ -53,5 +53,7 @@ Priority = Events x Blast Radius
 ```
 
 CRITICAL > HIGH > MEDIUM > LOW
+
+Score every group the same way regardless of category. Infra/network issues are scored on real impact too — a high-volume timeout that blocks core functionality is CRITICAL, while a one-off transient blip is LOW. Category is context, not a discount.
 
 Focus on CRITICAL and HIGH first. MEDIUM and LOW can wait.

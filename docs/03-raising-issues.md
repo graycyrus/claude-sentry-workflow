@@ -41,6 +41,7 @@ Every Sentry issue gets:
 - `sentry-traced-bug` — always
 - `bug` — always
 - `os:<platform>` — from event OS tags (`os:windows`, `os:macos`, `os:linux`, `os:all`)
+- `category:<code-bug|infra>` — from triage categorization (so infra/network issues stay distinguishable)
 - `priority: <level>` — from triage scoring
 
 Create labels that don't exist yet:
@@ -54,4 +55,4 @@ gh label create "sentry-traced-bug" --repo $REPO --description "Bug traced from 
 - Never update Sentry issue status
 - Never assign unless user says to
 - Never skip root cause analysis
-- Never create issues for noise
+- Never drop infra/network issues — raise them like any other bug, tagged with their `category` label

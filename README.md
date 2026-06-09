@@ -1,6 +1,6 @@
 # claude-sentry-workflow
 
-AI-assisted Sentry bug triage workflow for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Fetch errors from Sentry, classify signal vs noise, analyze root causes, and raise well-structured GitHub issues — all with structured agent orchestration.
+AI-assisted Sentry bug triage workflow for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Fetch errors from Sentry, categorize them (code-bug vs infra/network), analyze root causes, and raise well-structured GitHub issues for every issue — all with structured agent orchestration.
 
 Companion to [claude-workflow](https://github.com/graycyrus/claude-workflow). That workflow picks up GitHub issues and ships PRs. This one **creates** those issues from Sentry errors.
 
@@ -13,7 +13,7 @@ A set of Claude Code **skills** (slash commands) that give Claude a structured p
 | Skill | What it does |
 |---|---|
 | `/brb-sentry-workflow` | Full orchestrator — Sentry fetch to GitHub issue |
-| `/brb-sentry-triage` | Classify noise vs real bugs, group by root cause, deduplicate, score priority |
+| `/brb-sentry-triage` | Categorize issues (code-bug vs infra/network), group by root cause, deduplicate, score priority — nothing dropped |
 | `/brb-sentry-analyze` | Deep-dive into a bug — map to source, identify root cause, assess complexity |
 | `/brb-sentry-raise-issue` | Create a well-structured GitHub issue with full Sentry context |
 | `/brb-sentry-update` | Pull latest skills from GitHub and update your install |
@@ -77,7 +77,7 @@ You: openhuman-tauri and openhuman-react
 Claude: "Should I show only issues assigned to you, or all unresolved?"
 You: all
 Claude: [fetches 47 unresolved issues]
-        [classifies: 31 noise, 16 real bugs]
+        [categorizes: 31 infra, 16 code-bugs — all carried forward]
         [groups into 9 root causes]
         [checks GitHub — 3 already have issues]
         [scores remaining 6]
@@ -107,7 +107,7 @@ Claude: [reads Sentry events, maps to source code]
 The workflow follows a structured pipeline:
 
 1. **Fetch** — Pull unresolved Sentry issues via MCP tools
-2. **Triage** — Classify noise vs real bugs using pattern matching
+2. **Triage** — Categorize issues (code-bug vs infra/network) using pattern matching — nothing dropped
 3. **Group** — Combine related issues sharing the same root cause
 4. **Deduplicate** — Filter out bugs that already have GitHub issues
 5. **Score** — Rank by Events x Blast Radius
@@ -117,7 +117,7 @@ The workflow follows a structured pipeline:
 ## Philosophy
 
 - **Ask before fetching.** Always ask which project and assignee filter.
-- **Signal over noise.** Most Sentry issues are infrastructure/network noise. The workflow filters aggressively.
+- **Categorize, don't drop.** Many Sentry issues are infrastructure/network — they're tagged `category:infra` and raised like any other bug, not filtered out. Category informs priority, never discards.
 - **One issue per root cause.** Group related Sentry issues — don't create duplicates.
 - **Deduplicate against GitHub.** Check existing issues before creating new ones.
 - **Scrub sensitive data.** No tokens, PII, or internal URLs in public issue bodies.
@@ -141,7 +141,7 @@ cd ~/.claude/claude-sentry-workflow && git pull
 Detailed reference docs in [`docs/`](docs/):
 
 - [Full workflow](docs/00-full-workflow.md) — complete step-by-step
-- [Triage](docs/01-triage.md) — noise patterns, bug patterns, priority scoring
+- [Triage](docs/01-triage.md) — category patterns, priority scoring
 - [Analysis](docs/02-analysis.md) — root cause investigation
 - [Raising issues](docs/03-raising-issues.md) — issue format, labels, sensitive data
 

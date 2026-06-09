@@ -44,6 +44,7 @@ gh issue create --repo $REPO \
   --label "sentry-traced-bug" \
   --label "bug" \
   --label "os:<platform>" \
+  --label "category:<code-bug|infra>" \
   --label "priority: <level>" \
   --body "$(cat <<'EOF'
 ## Bug Report
@@ -127,6 +128,10 @@ The OS where the bug was observed, from Sentry event `os` / `os.name` tag.
 | Multiple platforms | Add multiple `os:` labels |
 | Platform-agnostic | `os:all` |
 
+### `category:<code-bug|infra>`
+
+From triage categorization. `category:code-bug` for code defects; `category:infra` for infrastructure/network/environment issues. Applied to every issue so infra/network bugs stay distinguishable — they are raised, never dropped.
+
 ### `priority: <level>`
 
 From triage scoring: `priority: critical`, `priority: high`, `priority: medium`, `priority: low`.
@@ -141,6 +146,8 @@ gh label create "os:windows" --repo $REPO --color "0075ca" 2>/dev/null
 gh label create "os:macos" --repo $REPO --color "0075ca" 2>/dev/null
 gh label create "os:linux" --repo $REPO --color "0075ca" 2>/dev/null
 gh label create "os:all" --repo $REPO --color "0075ca" 2>/dev/null
+gh label create "category:code-bug" --repo $REPO --description "Code defect from Sentry triage" --color "5319e7" 2>/dev/null
+gh label create "category:infra" --repo $REPO --description "Infra/network/environment issue from Sentry triage" --color "5319e7" 2>/dev/null
 ```
 
 ---
@@ -150,7 +157,7 @@ gh label create "os:all" --repo $REPO --color "0075ca" 2>/dev/null
 - **Do NOT include sensitive information** — see scrubbing rules above
 - **Do NOT update Sentry issue status** — no resolving, archiving, or assigning in Sentry
 - **Do NOT assign the GitHub issue** unless the user explicitly says to
-- **Do NOT create issues for noise** — these should have been filtered in triage
+- **Do NOT drop infra/network issues** — raise them like any other bug, tagged with their `category` label from triage
 - **Do NOT create one issue per Sentry issue** — group by root cause
 - **Do NOT skip the root cause analysis** — "there's a Sentry error" is not enough context
 
